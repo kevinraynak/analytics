@@ -15,6 +15,17 @@ customer_orders as (
     from orders
     group by 1
 ),
+customer_tiers as (
+    select
+        customer_id,
+        case
+            when lifetime_value >= 1000 then 'Platinum'
+            when lifetime_value >= 500 then 'Gold'
+            when lifetime_value >= 100 then 'Silver'
+            else 'Bronze'
+        end as customer_tier
+    from customer_orders
+),
  final as (
     select
         customers.customer_id,
