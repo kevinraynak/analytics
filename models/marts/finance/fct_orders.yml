@@ -1,0 +1,24 @@
+models:
+- name: fct_orders
+  description: This model consolidates order information from the Jaffle Shop and
+    payment details from Stripe. It provides a comprehensive view of each order, including
+    the customer who placed the order, the date of the order, and the total amount
+    paid. This model is useful for analyzing order trends, customer purchasing behavior,
+    and financial reporting.
+  columns:
+  - name: order_id
+    description: A unique identifier for each order.
+    data_tests:
+      - unique
+      - not_null
+  - name: customer_id
+    description: The identifier for the customer who placed the order.
+    data_tests:
+      - not_null
+  - name: order_date
+    description: The date when the order was placed.
+    data_tests:
+      - not_null
+  - name: amount
+    description: The total amount paid for the order, with unsuccessful payments excluded.
+
