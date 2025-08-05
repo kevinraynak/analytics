@@ -1,0 +1,11 @@
+entities:
+  - name: order_id
+    type: primary
+dimensions:
+  - name: is_drink_order
+    type: categorical
+measures:
+  - name: median_revenue
+    description: the median revenue generated for each order item
+    agg: median
+    expr: product_price
