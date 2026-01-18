@@ -1,0 +1,46 @@
+semantic_models:
+- name: fct_orders
+  description: This model consolidates order information from the Jaffle Shop and
+    payment details from Stripe. It provides a comprehensive view of each order, including
+    the customer who placed the order, the date of the order, and the total amount
+    paid. This model is useful for analyzing order trends, customer purchasing behavior,
+    and financial reporting.
+  model: ref('fct_orders')
+  defaults:
+    agg_time_dimension: date
+  entities:
+  - name: order
+    type: primary
+    expr: order_id
+  - name: customer
+    type: foreign
+    expr: customer_id
+  dimensions:
+  - name: date
+    description: The date when the order was placed.
+    expr: order_date
+    type: time
+    type_params:
+      time_granularity: day
+  measures:
+  - name: amount
+    description: The total amount paid for the order, with unsuccessful payments excluded.
+    agg: sum
+    create_metric: true
+  - name: count_order
+    agg: count
+    create_metric: true
+    expr: order_id
+  - name: count_customer
+    agg: count_distinct
+    create_metric: true
+    expr: customer_id
+
+metrics:
+- name: total_gross_sales
+  description: Total gross sales from all orders.
+  label: Total Gross Sales
+  type: cumulative
+  type_params:
+    measure:
+      name: amount
