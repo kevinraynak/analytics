@@ -23,7 +23,7 @@ models:
           - accepted_values:
               values: ['shipped','completed', 'return_pending', 'returned', 'placed']
       - name: customer_id
-        decription: Foreign key to stg_customers.customer_id.
+        description: Foreign key to stg_customers.customer_id.
         data_tests:
           - relationships:
               to: ref('stg_jaffle_shop__customers')

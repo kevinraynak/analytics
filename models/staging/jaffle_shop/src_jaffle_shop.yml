@@ -23,7 +23,37 @@ sources:
         loaded_at_field: _etl_loaded_at
         columns:
           - name: id
-            decription: Primary key for Order data.
+            description: Primary key for Order data.
+            data_tests:
+              - unique
+              - not_null
+
+  - name: dbt_kraynak
+    description: kraynak schema
+    database: analytics
+    schema: dbt_kraynak
+    tables:
+      - name: fct_orders
+        description: Raw fct_orders data.
+        columns:
+          - name: order_id
+            description: Primary key for fct_order data.
+            data_tests:
+              - unique
+              - not_null
+      - name: fct_order_items
+        description: Raw fct_order_items data.
+        columns:
+          - name: order_item_key
+            description: Primary key for fct_order_items data.
+            data_tests:
+              - unique
+              - not_null
+      - name: dim_customers
+        description: Raw dim_customer data.
+        columns:
+          - name: customer_id
+            description: Primary key for Customer data.
             data_tests:
               - unique
               - not_null
