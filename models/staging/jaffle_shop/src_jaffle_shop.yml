@@ -30,6 +30,7 @@ sources:
 
   - name: dbt_kraynak
     description: kraynak schema
+    freshness: null
     database: analytics
     schema: dbt_kraynak
     tables:
