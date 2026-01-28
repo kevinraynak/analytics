@@ -23,9 +23,41 @@ models:
           - accepted_values:
               values: ['shipped','completed', 'return_pending', 'returned', 'placed']
       - name: customer_id
-        decription: Foreign key to stg_customers.customer_id.
+        description: Foreign key to stg_customers.customer_id.
         data_tests:
           - relationships:
               to: ref('stg_jaffle_shop__customers')
               field: customer_id
-          
+  - name: stg_jaffle_shop__fct_order_items
+    description: One unique customer per row
+    columns:
+      - name: order_item_key
+        description: Primary key for fct orders items.
+        data_tests: 
+          - unique
+          - not_null 
+      - name: order_item_status_code
+        description: Either shipped or build
+        data_tests:
+          - accepted_values:
+              values: ['shipped','billed']    
+  - name: stg_jaffle_shop__fct_orders
+    description: One unique customer per row
+    columns:
+      - name: order_id
+        description: Primary key for fct orders.
+        data_tests: 
+          - unique
+          - not_null 
+      - name: customer_id
+        description: Primary key for fct orders.
+        data_tests: 
+          - not_null     
+  - name: stg_jaffle_shop__dim_customers
+    description: One unique customer per row
+    columns:
+      - name: customer_id
+        description: Primary key for fct orders.
+        data_tests: 
+          - unique
+          - not_null                 

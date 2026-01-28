@@ -1,0 +1,9 @@
+SELECT 
+CUSTOMER_ID,
+FIRST_NAME,
+LAST_NAME, 
+FIRST_ORDER_DATE,
+MOST_RECENT_ORDER_DATE,
+NUMBER_OF_ORDERS, 
+LIFETIME_VALUE
+from {{ source('dbt_kraynak', 'dim_customers')}}
