@@ -1,0 +1,17 @@
+SELECT
+    TEAM_ID,
+    ABBREVIATION,
+    NICKNAME,
+    YEARFOUNDED,
+    CITY,
+    ARENA,
+    ARENACAPACITY,
+    OWNER,
+    GENERALMANAGER,
+    HEADCOACH,
+    DLEAGUEAFFILIATION,
+    FACEBOOK,
+    INSTAGRAM,
+    TWITTER
+
+from {{ source('dbt_kraynak', 'team_details')}}

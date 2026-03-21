@@ -12,7 +12,7 @@ sources:
       - name: common_player_info
         description: Information on players.
         columns:
-          - name: personal_id
+          - name: person_id
             description: Primary key for common_player_info data.
             data_tests:
               - unique
@@ -43,7 +43,7 @@ sources:
               - unique
               - not_null
       - name: game
-        description: Raw draft_combine_stats data.
+        description: Raw game data.
         columns:
           - name: game_id
             description: Primary key for game data.
@@ -79,7 +79,59 @@ sources:
         description: Raw officials data.
         columns:
           - name: official_id
-            description: Primary key for draft_history data.
+            description: Primary key for officials data.
             data_tests:
               - unique
               - not_null
+
+      - name: other_stats
+        description: Raw random or other stats data.
+        columns:
+          - name: game_id
+            description: Primary key for random stats data.
+            data_tests:
+              - not_null
+
+      - name: play_by_play
+        description: Raw play by play data.
+        columns:
+          - name: game_id
+            description: Primary key for play by play data.
+            data_tests:
+              - not_null              
+
+      - name: player
+        description: Raw player data.
+        columns:
+          - name: id
+            description: Primary key for player data.
+            data_tests:
+              - unique
+              - not_null
+      - name: team_details
+        description: Raw officials data.
+        columns:
+          - name: team_id
+            description: Primary key for team details data.
+            data_tests:
+              - unique
+              - not_null              
+
+      - name: team_history
+        description: Raw team histroy data.
+        columns:
+          - name: team_id
+            description: Primary key for team history data.
+            data_tests:
+              - unique
+              - not_null            
+
+      - name: team
+        description: Raw team data.
+        columns:
+          - name: id
+            description: Primary key for team data.
+            data_tests:
+              - unique
+              - not_null
+                         
