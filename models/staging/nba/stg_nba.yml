@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: stg_nba__player_info
+    description: One unique player per row
+    columns:
+      - name: personal_id
+        description: Primary key for player information.
+        data_tests: 
+          - unique
+          - not_null 

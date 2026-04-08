@@ -1,0 +1,137 @@
+version: 2
+
+sources:
+
+
+  - name: dbt_kraynak
+    description: kraynak schema for NBA data
+    database: analytics
+    schema: dbt_kraynak
+    tables:
+
+      - name: common_player_info
+        description: Information on players.
+        columns:
+          - name: person_id
+            description: Primary key for common_player_info data.
+            data_tests:
+              - unique
+              - not_null
+      - name: draft_combine_stats
+        description: Raw draft_combine_stats data.
+        columns:
+          - name: player_id
+            description: Primary key for draft combine stats data.
+            data_tests:
+              - unique
+              - not_null
+      - name: draft_history
+        description: Raw draft_history data.
+        columns:
+          - name: person_id
+            description: Primary key for draft_history data.
+            data_tests:
+              - unique
+              - not_null
+
+      - name: game_info
+        description: Raw game_info data.
+        columns:
+          - name: game_id
+            description: Primary key for game id data.
+            data_tests:
+              - unique
+              - not_null
+      - name: game
+        description: Raw game data.
+        columns:
+          - name: game_id
+            description: Primary key for game data.
+            data_tests:
+              - unique
+              - not_null
+      - name: game_summary
+        description: Raw game summary data.
+        columns:
+          - name: game_id
+            description: Primary key for game summary data.
+            data_tests:
+              - unique
+              - not_null
+
+      - name: inactive_players
+        description: Raw inactive players data.
+        columns:
+          - name: game_id
+            description: Primary key for inactive player data.
+            data_tests:
+              - not_null              
+
+      - name: line_score
+        description: Raw draft_combine_stats data.
+        columns:
+          - name: game_id
+            description: Primary key for line score data.
+            data_tests:
+              - unique
+              - not_null
+      - name: officials
+        description: Raw officials data.
+        columns:
+          - name: official_id
+            description: Primary key for officials data.
+            data_tests:
+              - unique
+              - not_null
+
+      - name: other_stats
+        description: Raw random or other stats data.
+        columns:
+          - name: game_id
+            description: Primary key for random stats data.
+            data_tests:
+              - not_null
+
+      - name: play_by_play
+        description: Raw play by play data.
+        columns:
+          - name: game_id
+            description: Primary key for play by play data.
+            data_tests:
+              - not_null              
+
+      - name: player
+        description: Raw player data.
+        columns:
+          - name: id
+            description: Primary key for player data.
+            data_tests:
+              - unique
+              - not_null
+      - name: team_details
+        description: Raw officials data.
+        columns:
+          - name: team_id
+            description: Primary key for team details data.
+            data_tests:
+              - unique
+              - not_null              
+
+      - name: team_history
+        description: Raw team histroy data.
+        columns:
+          - name: team_id
+            description: Primary key for team history data.
+            data_tests:
+              - unique
+              - not_null            
+
+      - name: team
+        description: Raw team data.
+        columns:
+          - name: id
+            description: Primary key for team data.
+            data_tests:
+              - unique
+              - not_null
+                         
