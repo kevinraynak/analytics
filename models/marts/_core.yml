@@ -1,0 +1,266 @@
+version: 2
+
+models:
+
+  - name: dim_players
+    description: >
+      Player dimension table — one row per NBA player. The primary lookup for
+      player identity, biographical info, draft details, and combine measurements.
+      Join this to fact tables on player_id.
+    columns:
+      - name: player_id
+        description: Primary key — unique identifier for each player.
+        data_tests:
+          - unique
+          - not_null
+      - name: full_name
+        description: Player's full display name.
+      - name: first_name
+        description: Player's first name.
+      - name: last_name
+        description: Player's last name.
+      - name: is_active
+        description: Boolean — whether the player is on an active NBA roster.
+      - name: roster_status
+        description: Roster status field from common_player_info.
+      - name: team_id
+        description: Foreign key to dim_teams — current team.
+      - name: team_name
+        description: Current team's full name.
+      - name: team_abbreviation
+        description: Current team's 3-letter abbreviation.
+      - name: birthdate
+        description: Player's date of birth.
+      - name: country
+        description: Player's country of origin.
+      - name: college
+        description: College or university the player attended before the NBA.
+      - name: height
+        description: Player height.
+      - name: weight
+        description: Player weight.
+      - name: position
+        description: Primary position (e.g., Guard, Forward, Center).
+      - name: jersey
+        description: Current jersey number.
+      - name: seasons_experience
+        description: Number of NBA seasons played.
+      - name: from_year
+        description: First year in the NBA.
+      - name: to_year
+        description: Most recent year active in the NBA.
+      - name: draft_year
+        description: Year the player was drafted.
+      - name: draft_round
+        description: Round in which the player was drafted.
+      - name: pick_in_round
+        description: Pick number within the draft round.
+      - name: overall_pick
+        description: Overall pick number across the full draft.
+      - name: combine_height
+        description: Height measured at the NBA Draft Combine (shoes on).
+      - name: combine_weight
+        description: Weight measured at the NBA Draft Combine.
+      - name: combine_wingspan
+        description: Wingspan measured at the NBA Draft Combine.
+      - name: combine_max_vertical
+        description: Max vertical leap measured at the NBA Draft Combine (inches).
+      - name: combine_lane_agility_time
+        description: Lane agility drill time at the NBA Draft Combine (seconds).
+      - name: combine_sprint_time
+        description: 3/4 court sprint time at the NBA Draft Combine (seconds).
+      - name: greatest_75_flag
+        description: Flag for NBA 75th Anniversary Team members.
+
+  - name: dim_teams
+    description: >
+      Team dimension table — one row per NBA franchise. The primary lookup for
+      team identity, arena, leadership, and all-time records.
+      Join to fact tables on team_id.
+    columns:
+      - name: team_id
+        description: Primary key — unique identifier for each team.
+        data_tests:
+          - unique
+          - not_null
+      - name: team_name
+        description: Full franchise name (e.g., Los Angeles Lakers).
+      - name: team_abbreviation
+        description: 3-letter team abbreviation (e.g., LAL).
+      - name: team_nickname
+        description: Team nickname (e.g., Lakers).
+      - name: team_city
+        description: City the team represents.
+      - name: team_state
+        description: State the team is based in.
+      - name: year_founded
+        description: Year the franchise was founded.
+      - name: arena
+        description: Name of the team's home arena.
+      - name: arena_capacity
+        description: Seating capacity of the home arena.
+      - name: owner
+        description: Current team owner(s).
+      - name: general_manager
+        description: Current general manager.
+      - name: head_coach
+        description: Current head coach.
+      - name: g_league_affiliate
+        description: NBA G League affiliate team.
+      - name: total_games_played
+        description: All-time total games played by this franchise in the dataset.
+      - name: total_wins
+        description: All-time total wins by this franchise in the dataset.
+      - name: total_losses
+        description: All-time total losses by this franchise in the dataset.
+      - name: all_time_win_pct
+        description: All-time win percentage for this franchise in the dataset.
+
+  - name: dim_games
+    description: >
+      Game dimension table — one row per NBA game. Provides full game context
+      including date, season, matchup, TV network, attendance, and officials.
+      Join to fact tables on game_id.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+      - name: game_date
+        description: Date the game was played.
+        data_tests:
+          - not_null
+      - name: game_year
+        description: Calendar year the game was played.
+      - name: game_month
+        description: Month number the game was played (1-12).
+      - name: game_day_of_week
+        description: Day of the week the game was played (0=Sunday in Snowflake).
+      - name: season_id
+        description: NBA season identifier.
+      - name: season
+        description: NBA season label (e.g., 2021-22).
+      - name: season_type
+        description: Game type — Regular Season, Playoffs, Preseason, etc.
+      - name: team_id_home
+        description: Foreign key to dim_teams for the home team.
+      - name: team_id_away
+        description: Foreign key to dim_teams for the away team.
+      - name: winning_team_id
+        description: Team ID of the game winner.
+      - name: national_tv_network
+        description: National TV broadcaster (e.g., ESPN, TNT). Null for local-only games.
+      - name: attendance
+        description: Number of fans in attendance.
+      - name: went_to_overtime
+        description: Boolean — true if the game went to overtime.
+      - name: point_differential
+        description: Absolute final score difference between the two teams.
+      - name: officials_crew
+        description: Comma-separated list of referee names for the game.
+
+  - name: fct_games
+    description: >
+      Core game fact table — one row per NBA game with full box score stats for
+      both teams, quarter-by-quarter scoring, advanced stats, and derived fields.
+      The primary fact table for any game-level analysis or aggregation.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+      - name: game_date
+        description: Date the game was played.
+        data_tests:
+          - not_null
+      - name: team_id_home
+        description: Foreign key to dim_teams — home team.
+      - name: team_id_away
+        description: Foreign key to dim_teams — away team.
+      - name: pts_home
+        description: Final points scored by the home team.
+      - name: pts_away
+        description: Final points scored by the away team.
+      - name: winning_team_id
+        description: Team ID of the game winner.
+      - name: point_differential
+        description: Absolute difference in final score.
+      - name: total_pts_scored
+        description: Combined points scored by both teams (pts_home + pts_away).
+      - name: went_to_overtime
+        description: Boolean — true if the game went to overtime.
+      - name: lead_changes
+        description: Number of times the lead changed hands during the game.
+      - name: times_tied
+        description: Number of times the game was tied.
+
+  - name: fct_team_game_stats
+    description: >
+      Team-game fact table — one row per team per game. Unpivoted from the wide
+      home/away format, making it easy to query team performance across any date range
+      or opponent without complex case statements. The go-to table for team analysis.
+    columns:
+      - name: game_id
+        description: Foreign key referencing the game.
+        data_tests:
+          - not_null
+      - name: team_id
+        description: Foreign key to dim_teams — the team this row represents.
+        data_tests:
+          - not_null
+      - name: game_date
+        description: Date the game was played.
+      - name: home_away
+        description: Whether this team was the home or away team.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['home', 'away']
+      - name: win_loss
+        description: Game result from this team's perspective — 'W' or 'L'.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['W', 'L']
+      - name: is_win
+        description: Binary win indicator (1 = win, 0 = loss).
+      - name: pts
+        description: Points scored by this team.
+      - name: opponent_pts
+        description: Points scored by the opponent.
+      - name: point_differential
+        description: This team's pts minus opponent pts. Positive = win.
+      - name: fg_pct
+        description: Field goal percentage.
+      - name: fg3_pct
+        description: Three-point field goal percentage.
+      - name: ft_pct
+        description: Free throw percentage.
+
+  - name: fct_draft
+    description: >
+      Draft fact table — one row per drafted NBA player. Combines draft pick details,
+      combine measurements, and current career outcomes. Ideal for scouting analysis
+      and demonstrating long-term draft value.
+    columns:
+      - name: player_id
+        description: Primary key — unique identifier for each drafted player.
+        data_tests:
+          - unique
+          - not_null
+      - name: player_name
+        description: Player's full name at time of draft.
+      - name: draft_year
+        description: Year the player was drafted.
+      - name: overall_pick
+        description: Overall pick number in the draft.
+      - name: team_id
+        description: Foreign key to dim_teams — team that drafted the player.
+      - name: is_active
+        description: Whether the player is currently active in the NBA.
+      - name: seasons_experience
+        description: Number of NBA seasons played (career longevity indicator).
+      - name: greatest_75_flag
+        description: Flag for NBA 75th Anniversary Team members — the ultimate career benchmark.

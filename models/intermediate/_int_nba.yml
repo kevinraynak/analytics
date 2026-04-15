@@ -1,0 +1,81 @@
+version: 2
+
+models:
+
+  - name: int_nba__games_enriched
+    description: >
+      Enriched game-level model that joins the core box score (stg_nba__game) with
+      game metadata, quarter-by-quarter scores, attendance info, and advanced stats.
+      One row per game. This is the primary source for game-level mart models.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+      - name: game_date
+        description: Date the game was played.
+        data_tests:
+          - not_null
+      - name: winning_team_id
+        description: Team ID of the game winner (derived from pts comparison).
+      - name: point_differential
+        description: Absolute difference in final score between home and away teams.
+      - name: went_to_overtime
+        description: Boolean flag — true if the game went to at least one overtime period.
+
+  - name: int_nba__team_game_stats
+    description: >
+      Unpivots the wide home/away game format into one row per team per game.
+      This makes team-level performance analysis significantly simpler — no need
+      to union home and away in downstream models.
+    columns:
+      - name: game_id
+        description: Foreign key referencing the game.
+        data_tests:
+          - not_null
+      - name: team_id
+        description: The team this row represents.
+        data_tests:
+          - not_null
+      - name: home_away
+        description: Whether this team was the home or away team ('home' / 'away').
+      - name: win_loss
+        description: Outcome for this team — 'W' or 'L'.
+      - name: is_win
+        description: Binary win flag — 1 for a win, 0 for a loss.
+      - name: point_differential
+        description: This team's pts minus the opponent's pts (positive = win).
+
+  - name: int_nba__players_enriched
+    description: >
+      Enriched player profile combining stg_nba__player_info (biographical/career),
+      stg_nba__player (active status), stg_nba__draft_history (draft pick details),
+      and stg_nba__draft_stats (combine measurements). This model can contain multiple
+      rows per player when a player has multiple historical draft records.
+    columns:
+      - name: player_id
+        description: Identifier for the player.
+        data_tests:
+          - not_null
+      - name: full_name
+        description: Player's full display name.
+      - name: is_active
+        description: Whether the player is currently on an active NBA roster.
+      - name: greatest_75_flag
+        description: Whether the player was named to the NBA 75th Anniversary Team.
+
+  - name: int_nba__teams_enriched
+    description: >
+      Enriched team profile joining the master team list (stg_nba__team) with
+      detailed team info (stg_nba__team_details). One row per franchise.
+    columns:
+      - name: team_id
+        description: Primary key — unique identifier for each team.
+        data_tests:
+          - unique
+          - not_null
+      - name: team_name
+        description: Full franchise name (e.g., Los Angeles Lakers).
+      - name: head_coach
+        description: Current head coach.

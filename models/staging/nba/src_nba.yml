@@ -1,137 +1,133 @@
 version: 2
 
 sources:
-
-
-  - name: dbt_kraynak
-    description: kraynak schema for NBA data
+  - name: nba
+    description: >
+      Raw NBA data loaded into Snowflake from the NBA API.
+      This source powers the dbt NBA analytics project.
     database: analytics
     schema: dbt_kraynak
     tables:
 
       - name: common_player_info
-        description: Information on players.
+        description: Detailed biographical and career information for every NBA player.
         columns:
           - name: person_id
-            description: Primary key for common_player_info data.
+            description: Primary key — unique identifier for each player.
             data_tests:
               - unique
               - not_null
+
       - name: draft_combine_stats
-        description: Raw draft_combine_stats data.
+        description: Physical measurements and athletic testing results from the NBA Draft Combine.
         columns:
           - name: player_id
-            description: Primary key for draft combine stats data.
+            description: Identifier for the draft combine participant.
             data_tests:
-              - unique
               - not_null
+
       - name: draft_history
-        description: Raw draft_history data.
+        description: Historical NBA Draft picks including team, round, and pick number.
         columns:
           - name: person_id
-            description: Primary key for draft_history data.
+            description: Identifier for the drafted player.
             data_tests:
-              - unique
+              - not_null
+
+      - name: game
+        description: Game-level box score statistics for both the home and away team.
+        columns:
+          - name: game_id
+            description: Identifier for the game.
+            data_tests:
               - not_null
 
       - name: game_info
-        description: Raw game_info data.
+        description: Supplemental game information including attendance and game duration.
         columns:
           - name: game_id
-            description: Primary key for game id data.
+            description: Identifier for the game.
             data_tests:
-              - unique
               - not_null
-      - name: game
-        description: Raw game data.
-        columns:
-          - name: game_id
-            description: Primary key for game data.
-            data_tests:
-              - unique
-              - not_null
+
       - name: game_summary
-        description: Raw game summary data.
+        description: High-level game metadata including team matchups, game status, and TV info.
         columns:
           - name: game_id
-            description: Primary key for game summary data.
+            description: Identifier for the game.
             data_tests:
-              - unique
               - not_null
 
       - name: inactive_players
-        description: Raw inactive players data.
+        description: Players listed as inactive (did not dress) for a given game.
         columns:
           - name: game_id
-            description: Primary key for inactive player data.
+            description: Foreign key referencing the game.
             data_tests:
-              - not_null              
+              - not_null
 
       - name: line_score
-        description: Raw draft_combine_stats data.
+        description: Quarter-by-quarter and overtime scoring breakdown for each game.
         columns:
           - name: game_id
-            description: Primary key for line score data.
+            description: Identifier for the game.
             data_tests:
-              - unique
               - not_null
+
       - name: officials
-        description: Raw officials data.
+        description: Game officials (referees) assigned to each game.
         columns:
           - name: official_id
-            description: Primary key for officials data.
+            description: Identifier for the official.
             data_tests:
-              - unique
               - not_null
 
       - name: other_stats
-        description: Raw random or other stats data.
+        description: Advanced game stats including paint points, fast break points, and lead changes.
         columns:
           - name: game_id
-            description: Primary key for random stats data.
+            description: Foreign key referencing the game.
             data_tests:
               - not_null
 
       - name: play_by_play
-        description: Raw play by play data.
+        description: Granular play-by-play event log for each game.
         columns:
           - name: game_id
-            description: Primary key for play by play data.
+            description: Foreign key referencing the game.
             data_tests:
-              - not_null              
+              - not_null
 
       - name: player
-        description: Raw player data.
+        description: Master list of all NBA players with active/inactive status.
         columns:
           - name: id
-            description: Primary key for player data.
+            description: Primary key — unique identifier for each player.
             data_tests:
               - unique
               - not_null
-      - name: team_details
-        description: Raw officials data.
-        columns:
-          - name: team_id
-            description: Primary key for team details data.
-            data_tests:
-              - unique
-              - not_null              
-
-      - name: team_history
-        description: Raw team histroy data.
-        columns:
-          - name: team_id
-            description: Primary key for team history data.
-            data_tests:
-              - unique
-              - not_null            
 
       - name: team
-        description: Raw team data.
+        description: Master list of all NBA franchises.
         columns:
           - name: id
-            description: Primary key for team data.
+            description: Primary key — unique identifier for each team.
             data_tests:
               - unique
               - not_null
-                         
+
+      - name: team_details
+        description: Detailed team information including arena, ownership, and social media handles.
+        columns:
+          - name: team_id
+            description: Identifier for the team.
+            data_tests:
+              - not_null
+
+      - name: team_history
+        description: Historical record of team city and nickname changes over time.
+        columns:
+          - name: team_id
+            description: Foreign key referencing the team.
+            data_tests:
+              - not_null

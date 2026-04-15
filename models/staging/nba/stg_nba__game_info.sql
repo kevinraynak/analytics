@@ -1,7 +1,16 @@
-select
-    GAME_ID,
-    GAME_DATE,
-    ATTENDANCE,
-    GAME_TIME
+with source as (
+    select * from {{ source('nba', 'game_info') }}
+),
 
-from {{ source('dbt_kraynak', 'game_info')}}
+renamed as (
+    select
+        game_id,
+        game_date,
+        attendance,
+        game_time
+
+    from source
+)
+
+select distinct * from renamed
+

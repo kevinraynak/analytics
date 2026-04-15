@@ -1,8 +1,16 @@
-SELECT
-    ID AS PLAYER_ID,
-    FULL_NAME,
-    FIRST_NAME,
-    LAST_NAME,
-    IS_ACTIVE
+with source as (
+    select * from {{ source('nba', 'player') }}
+),
 
-from {{ source('dbt_kraynak', 'player')}}
+renamed as (
+    select
+        id          as player_id,
+        full_name,
+        first_name,
+        last_name,
+        is_active
+
+    from source
+)
+
+select * from renamed

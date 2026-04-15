@@ -1,11 +1,242 @@
 version: 2
 
 models:
-  - name: stg_nba__player_info
-    description: One unique player per row
+
+  - name: stg_nba__game
+    description: >
+      One row per NBA game. Contains box score statistics for both the home and away
+      team in a wide format. This is the central staging model for game-level analysis.
     columns:
-      - name: personal_id
-        description: Primary key for player information.
-        data_tests: 
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
           - unique
-          - not_null 
+          - not_null
+      - name: game_date
+        description: Date the game was played.
+        data_tests:
+          - not_null
+      - name: season_id
+        description: Identifier for the NBA season (e.g., 22021 for 2021-22).
+      - name: season_type
+        description: Type of game — Regular Season, Playoffs, Preseason, etc.
+      - name: team_id_home
+        description: Foreign key to dim_teams for the home team.
+      - name: pts_home
+        description: Points scored by the home team.
+      - name: pts_away
+        description: Points scored by the away team.
+      - name: wl_home
+        description: Win or loss result for the home team (W/L).
+      - name: wl_away
+        description: Win or loss result for the away team (W/L).
+
+  - name: stg_nba__game_info
+    description: Supplemental game metadata including attendance and game duration.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+      - name: attendance
+        description: Number of fans in attendance.
+      - name: game_time
+        description: Duration of the game.
+
+  - name: stg_nba__game_summary
+    description: >
+      High-level game summary including team matchup IDs, game status, season,
+      and national TV broadcast info.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+      - name: home_team_id
+        description: Team ID for the home team.
+      - name: visitor_team_id
+        description: Team ID for the visiting (away) team.
+      - name: national_tv_network
+        description: National TV broadcaster abbreviation (e.g., ESPN, TNT).
+      - name: season
+        description: Season label (e.g., 2021-22).
+
+  - name: stg_nba__line_score
+    description: >
+      Quarter-by-quarter and overtime scoring breakdown for each game.
+      Both home and away teams are represented in a wide format.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_nba__other_stats
+    description: >
+      Advanced game stats including paint points, second-chance points,
+      fast break points, and lead changes. Useful for deeper game analysis.
+    columns:
+      - name: game_id
+        description: Primary key — unique identifier for each game.
+        data_tests:
+          - not_null
+
+  - name: stg_nba__play_by_play
+    description: >
+      Granular play-by-play event log. One row per event per game.
+      Includes player IDs, event types, score at time of event, and game clock.
+    columns:
+      - name: game_id
+        description: Foreign key to the game.
+        data_tests:
+          - not_null
+      - name: eventnum
+        description: Sequential event number within a game.
+      - name: eventmsgtype
+        description: Numeric code for the type of play event (e.g., 1=made shot, 2=missed shot).
+      - name: period
+        description: Quarter or overtime period the event occurred in.
+
+  - name: stg_nba__officials
+    description: One row per official per game. Referees assigned to each game.
+    columns:
+      - name: official_id
+        description: Identifier for the official.
+        data_tests:
+          - not_null
+      - name: game_id
+        description: Foreign key referencing the game.
+        data_tests:
+          - not_null
+      - name: full_name
+        description: Official's full name (derived from first_name + last_name).
+
+  - name: stg_nba__inactive_players
+    description: >
+      Players who were listed as inactive (did not dress) for a given game.
+      One row per player per game they were inactive.
+    columns:
+      - name: game_id
+        description: Foreign key referencing the game.
+        data_tests:
+          - not_null
+      - name: player_id
+        description: Foreign key referencing the player.
+        data_tests:
+          - not_null
+
+  - name: stg_nba__player
+    description: Master player list with active/inactive status. One row per player.
+    columns:
+      - name: player_id
+        description: Primary key — unique identifier for each player.
+        data_tests:
+          - unique
+          - not_null
+      - name: full_name
+        description: Player's full name.
+      - name: is_active
+        description: Boolean — whether the player is currently active in the NBA.
+
+  - name: stg_nba__player_info
+    description: >
+      Detailed biographical and career information for every NBA player.
+      Sourced from common_player_info. One row per player.
+    columns:
+      - name: player_id
+        description: Primary key — unique identifier for each player.
+        data_tests:
+          - unique
+          - not_null
+      - name: full_name
+        description: Player's display name.
+      - name: position
+        description: Player's primary position (e.g., Guard, Forward, Center).
+      - name: draft_year
+        description: Year the player was drafted.
+      - name: draft_round
+        description: Round in which the player was drafted.
+      - name: draft_number
+        description: Overall pick number in the draft.
+      - name: greatest_75_flag
+        description: Whether the player was named to the NBA's 75th Anniversary Team.
+
+  - name: stg_nba__team
+    description: Master list of all NBA franchises. One row per team.
+    columns:
+      - name: team_id
+        description: Primary key — unique identifier for each team.
+        data_tests:
+          - unique
+          - not_null
+      - name: team_name
+        description: Full team name (e.g., Los Angeles Lakers).
+      - name: team_abbreviation
+        description: 3-letter team abbreviation (e.g., LAL).
+
+  - name: stg_nba__team_details
+    description: >
+      Detailed team info including arena, ownership, coaching staff,
+      and social media handles. One row per team.
+    columns:
+      - name: team_id
+        description: Primary key — unique identifier for each team.
+        data_tests:
+          - unique
+          - not_null
+      - name: arena
+        description: Name of the team's home arena.
+      - name: head_coach
+        description: The team's current head coach.
+      - name: g_league_affiliate
+        description: The team's NBA G League affiliate.
+
+  - name: stg_nba__team_history
+    description: >
+      Historical record of team relocations and nickname changes.
+      Each row represents a period of time a team existed under a city/nickname combination.
+    columns:
+      - name: team_id
+        description: Foreign key referencing the team.
+        data_tests:
+          - not_null
+      - name: city
+        description: City the team played in during this period.
+      - name: nickname
+        description: Team nickname during this period.
+      - name: year_founded
+        description: Year the team started playing under this city/nickname.
+      - name: year_active_till
+        description: Last year the team played under this city/nickname.
+
+  - name: stg_nba__draft_history
+    description: >
+      Historical NBA Draft picks. Includes draft year, round, pick number, and drafting team.
+    columns:
+      - name: player_id
+        description: Identifier for the drafted player.
+        data_tests:
+          - not_null
+      - name: draft_year
+        description: Year of the draft.
+      - name: overall_pick
+        description: Overall pick number in the draft.
+      - name: team_id
+        description: Team that selected the player.
+
+  - name: stg_nba__draft_stats
+    description: >
+      Physical measurements and athletic testing results from the NBA Draft Combine.
+      One row per draft combine participant per year.
+    columns:
+      - name: player_id
+        description: Identifier for the draft combine participant.
+        data_tests:
+          - not_null
+      - name: draft_combine_year
+        description: Year of the draft combine.
+      - name: position
+        description: Player's projected position.
