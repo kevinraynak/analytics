@@ -1,10 +1,18 @@
-SELECT
-    ID AS TEAM_ID,
-    FULL_NAME,
-    ABBREVIATION,
-    NICKNAME,
-    CITY,
-    STATE,
-    YEAR_FOUNDED
+with source as (
+    select * from {{ source('nba', 'team') }}
+),
 
-from {{ source('dbt_kraynak', 'team')}}
+renamed as (
+    select
+        id              as team_id,
+        full_name       as team_name,
+        abbreviation    as team_abbreviation,
+        nickname        as team_nickname,
+        city            as team_city,
+        state           as team_state,
+        year_founded
+
+    from source
+)
+
+select * from renamed

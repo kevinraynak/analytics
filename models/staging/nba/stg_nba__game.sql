@@ -1,58 +1,93 @@
-SELECT
-    SEASON_ID,
-    TEAM_ID_HOME,
-    TEAM_ABBREVIATION_HOME,
-    TEAM_NAME_HOME,
-    GAME_ID,
-    GAME_DATE,
-    MATCHUP_HOME,
-    WL_HOME,
-    MIN,
-    FGM_HOME,
-    FGA_HOME,
-    FG_PCT_HOME,
-    FG3M_HOME,
-    FG3A_HOME,
-    FG3_PCT_HOME,
-    FTM_HOME,
-    FTA_HOME,
-    FT_PCT_HOME,
-    OREB_HOME,
-    DREB_HOME,
-    REB_HOME,
-    AST_HOME,
-    STL_HOME,
-    BLK_HOME,
-    TOV_HOME,
-    PF_HOME,
-    PTS_HOME,
-    PLUS_MINUS_HOME,
-    VIDEO_AVAILABLE_HOME,
-    TEAM_ID_AWAY,
-    TEAM_ABBREVIATION_AWAY,
-    TEAM_NAME_AWAY,
-    MATCHUP_AWAY,
-    WL_AWAY,
-    FGM_AWAY,
-    FGA_AWAY,
-    FG_PCT_AWAY,
-    FG3M_AWAY,
-    FG3A_AWAY,
-    FG3_PCT_AWAY,
-    FTM_AWAY,
-    FTA_AWAY,
-    FT_PCT_AWAY,
-    OREB_AWAY,
-    DREB_AWAY,
-    REB_AWAY,
-    AST_AWAY,
-    STL_AWAY,
-    BLK_AWAY,
-    TOV_AWAY,
-    PF_AWAY,
-    PTS_AWAY,
-    PLUS_MINUS_AWAY,
-    VIDEO_AVAILABLE_AWAY,
-    SEASON_TYPE
+with source as (
+    select * from {{ source('nba', 'game') }}
+),
 
-from {{ source('dbt_kraynak', 'game')}}
+renamed as (
+    select
+        -- identifiers
+        game_id,
+        season_id,
+        game_date,
+        replace(season_type, 'All Star', 'All-Star') as season_type,
+
+        -- home team identifiers
+        team_id_home,
+        team_abbreviation_home,
+        team_name_home,
+        matchup_home,
+
+        -- home team outcome
+        wl_home,
+        pts_home,
+        plus_minus_home,
+
+        -- home team shooting
+        fgm_home,
+        fga_home,
+        fg_pct_home,
+        fg3m_home,
+        fg3a_home,
+        fg3_pct_home,
+        ftm_home,
+        fta_home,
+        ft_pct_home,
+
+        -- home team other stats
+        oreb_home,
+        dreb_home,
+        reb_home,
+        ast_home,
+        stl_home,
+        blk_home,
+        tov_home,
+        pf_home,
+        min           as minutes_played,
+        video_available_home,
+
+        -- away team identifiers
+        team_id_away,
+        team_abbreviation_away,
+        team_name_away,
+        matchup_away,
+
+        -- away team outcome
+        wl_away,
+        pts_away,
+        plus_minus_away,
+
+        -- away team shooting
+        fgm_away,
+        fga_away,
+        fg_pct_away,
+        fg3m_away,
+        fg3a_away,
+        fg3_pct_away,
+        ftm_away,
+        fta_away,
+        ft_pct_away,
+
+        -- away team other stats
+        oreb_away,
+        dreb_away,
+        reb_away,
+        ast_away,
+        stl_away,
+        blk_away,
+        tov_away,
+        pf_away,
+        video_available_away
+
+    from source
+),
+
+deduped as (
+    select *
+    from renamed
+    qualify row_number() over (
+        partition by game_id
+        order by season_type desc
+    ) = 1
+)
+
+select * from deduped
+

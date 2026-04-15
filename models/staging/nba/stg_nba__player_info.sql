@@ -1,32 +1,55 @@
-select
-    person_id,
-    first_name,
-    last_name,
-    display_first_last as full_name,
-    birthdate,
-    school as college, 
-    country,
-    last_affiliation,
-    height,
-    weight,
-    season_exp,
-    jersey,
-    position,
-    rosterstatus,
-    games_played_current_season_flag,
-    team_id,
-    team_name, 
-    team_abbreviation,
-    team_code, 
-    team_city,
-    from_year,
-    to_year,
-    dleague_flag,
-    nba_flag,
-    games_played_flag,
-    draft_year,
-    draft_round,
-    draft_number,
-    greatest_75_flag
+with source as (
+    select * from {{ source('nba', 'common_player_info') }}
+),
 
-from {{ source('dbt_kraynak', 'common_player_info')}}
+renamed as (
+    select
+        -- identifiers
+        person_id               as player_id,
+        team_id,
+
+        -- name
+        first_name,
+        last_name,
+        display_first_last      as full_name,
+
+        -- biography
+        birthdate,
+        country,
+        school                  as college,
+        last_affiliation,
+
+        -- physical attributes
+        height,
+        weight,
+
+        -- career info
+        season_exp              as seasons_experience,
+        jersey,
+        position,
+        rosterstatus            as roster_status,
+        from_year,
+        to_year,
+
+        -- team info
+        team_name,
+        team_abbreviation,
+        team_code,
+        team_city,
+
+        -- draft info
+        draft_year,
+        draft_round,
+        draft_number,
+
+        -- flags
+        games_played_current_season_flag,
+        dleague_flag,
+        nba_flag,
+        games_played_flag,
+        greatest_75_flag
+
+    from source
+)
+
+select * from renamed

@@ -1,8 +1,16 @@
-SELECT
-    TEAM_ID,
-    CITY,
-    NICKNAME,
-    YEAR_FOUNDED,
-    YEAR_ACTIVE_TILL
+with source as (
+    select * from {{ source('nba', 'team_history') }}
+),
 
-from {{ source('dbt_kraynak', 'team_history')}}
+renamed as (
+    select
+        team_id,
+        city,
+        nickname,
+        year_founded,
+        year_active_till
+
+    from source
+)
+
+select * from renamed

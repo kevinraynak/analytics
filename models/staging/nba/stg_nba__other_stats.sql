@@ -1,29 +1,53 @@
-SELECT
-    GAME_ID,
-    LEAGUE_ID,
-    TEAM_ID_HOME,
-    TEAM_ABBREVIATION_HOME,
-    TEAM_CITY_HOME,
-    PTS_PAINT_HOME,
-    PTS_2ND_CHANCE_HOME,
-    PTS_FB_HOME,
-    LARGEST_LEAD_HOME,
-    LEAD_CHANGES,
-    TIMES_TIED,
-    TEAM_TURNOVERS_HOME,
-    TOTAL_TURNOVERS_HOME,
-    TEAM_REBOUNDS_HOME,
-    PTS_OFF_TO_HOME,
-    TEAM_ID_AWAY,
-    TEAM_ABBREVIATION_AWAY,
-    TEAM_CITY_AWAY,
-    PTS_PAINT_AWAY,
-    PTS_2ND_CHANCE_AWAY,
-    PTS_FB_AWAY,
-    LARGEST_LEAD_AWAY,
-    TEAM_TURNOVERS_AWAY,
-    TOTAL_TURNOVERS_AWAY,
-    TEAM_REBOUNDS_AWAY,
-    PTS_OFF_TO_AWAY
+with source as (
+    select * from {{ source('nba', 'other_stats') }}
+),
 
-from {{ source('dbt_kraynak', 'other_stats')}}
+renamed as (
+    select
+        game_id,
+        league_id,
+
+        -- home team
+        team_id_home,
+        team_abbreviation_home,
+        team_city_home,
+        pts_paint_home,
+        pts_2nd_chance_home,
+        pts_fb_home             as pts_fast_break_home,
+        largest_lead_home,
+        team_turnovers_home,
+        total_turnovers_home,
+        team_rebounds_home,
+        pts_off_to_home         as pts_off_turnovers_home,
+
+        -- away team
+        team_id_away,
+        team_abbreviation_away,
+        team_city_away,
+        pts_paint_away,
+        pts_2nd_chance_away,
+        pts_fb_away             as pts_fast_break_away,
+        largest_lead_away,
+        team_turnovers_away,
+        total_turnovers_away,
+        team_rebounds_away,
+        pts_off_to_away         as pts_off_turnovers_away,
+
+        -- game-level
+        lead_changes,
+        times_tied
+
+    from source
+),
+
+deduped as (
+    select *
+    from renamed
+    qualify row_number() over (
+        partition by game_id
+        order by coalesce(league_id, 0) desc
+    ) = 1
+)
+
+select * from deduped
+
