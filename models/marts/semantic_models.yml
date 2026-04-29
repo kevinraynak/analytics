@@ -1,703 +1,534 @@
-version: 2
+semantic_models:
 
-models:
-  - name: dim_players
+  # ---------------------------------------------------------------------------
+  # fct_team_game_stats
+  # Grain: one row per team per game
+  # ---------------------------------------------------------------------------
+  - name: team_game_stats
     description: >
-      Player dimension table — one row per NBA player. The primary lookup for
-      player identity, biographical info, draft details, and combine measurements.
-      Join this to fact tables on player_id.
-    semantic_model:
-      enabled: true
-      name: players
-    columns:
-      - name: player_id
-        description: Primary key — unique identifier for each player.
-        entity:
-          type: primary
-          name: player
-        data_tests:
-          - unique
-          - not_null
-      - name: full_name
-        description: Player's full display name.
-        dimension:
-          type: categorical
-      - name: first_name
-        description: Player's first name.
-        dimension:
-          type: categorical
-      - name: last_name
-        description: Player's last name.
-        dimension:
-          type: categorical
-      - name: is_active
-        description: Boolean — whether the player is on an active NBA roster.
-        dimension:
-          type: categorical
-      - name: roster_status
-        description: Roster status field from common_player_info.
-        dimension:
-          type: categorical
-      - name: team_id
-        description: Foreign key to dim_teams — current team.
-        entity:
-          type: foreign
-          name: team
-      - name: team_name
-        description: Current team's full name.
-        dimension:
-          type: categorical
-      - name: team_abbreviation
-        description: Current team's 3-letter abbreviation.
-        dimension:
-          type: categorical
-      - name: birthdate
-        description: Player's date of birth.
-      - name: country
-        description: Player's country of origin.
-        dimension:
-          type: categorical
-      - name: college
-        description: College or university the player attended before the NBA.
-        dimension:
-          type: categorical
-      - name: height
-        description: Player height.
-      - name: weight
-        description: Player weight.
-      - name: position
-        description: Primary position (e.g., Guard, Forward, Center).
-        dimension:
-          type: categorical
-      - name: jersey
-        description: Current jersey number.
-      - name: seasons_experience
-        description: Number of NBA seasons played.
-      - name: from_year
-        description: First year in the NBA.
-      - name: to_year
-        description: Most recent year active in the NBA.
-      - name: draft_year
-        description: Year the player was drafted.
-        dimension:
-          type: categorical
-      - name: draft_round
-        description: Round in which the player was drafted.
-        dimension:
-          type: categorical
-      - name: pick_in_round
-        description: Pick number within the draft round.
-      - name: overall_pick
-        description: Overall pick number across the full draft.
-      - name: combine_height
-        description: Height measured at the NBA Draft Combine (shoes on).
-      - name: combine_weight
-        description: Weight measured at the NBA Draft Combine.
-      - name: combine_wingspan
-        description: Wingspan measured at the NBA Draft Combine.
-      - name: combine_max_vertical
-        description: Max vertical leap measured at the NBA Draft Combine (inches).
-      - name: combine_lane_agility_time
-        description: Lane agility drill time at the NBA Draft Combine (seconds).
-      - name: combine_sprint_time
-        description: 3/4 court sprint time at the NBA Draft Combine (seconds).
-      - name: greatest_75_flag
-        description: Flag for NBA 75th Anniversary Team members.
-        dimension:
-          type: categorical
+      Team-game level fact table. One row per team per game. The primary semantic
+      model for team performance metrics — wins, scoring, shooting efficiency,
+      rebounding, assists, and game context.
+    model: ref('fct_team_game_stats')
 
-  - name: dim_teams
-    description: >
-      Team dimension table — one row per NBA franchise. The primary lookup for
-      team identity, arena, leadership, and all-time records.
-      Join to fact tables on team_id.
-    semantic_model:
-      enabled: true
-      name: teams
-    columns:
-      - name: team_id
-        description: Primary key — unique identifier for each team.
-        entity:
-          type: primary
-          name: team
-        data_tests:
-          - unique
-          - not_null
-      - name: team_name
-        description: Full franchise name (e.g., Los Angeles Lakers).
-        dimension:
-          type: categorical
-      - name: team_abbreviation
-        description: 3-letter team abbreviation (e.g., LAL).
-        dimension:
-          type: categorical
-      - name: team_nickname
-        description: Team nickname (e.g., Lakers).
-        dimension:
-          type: categorical
-      - name: team_city
-        description: City the team represents.
-        dimension:
-          type: categorical
-      - name: team_state
-        description: State the team is based in.
-        dimension:
-          type: categorical
-      - name: year_founded
-        description: Year the franchise was founded.
-      - name: arena
-        description: Name of the team's home arena.
-        dimension:
-          type: categorical
-      - name: arena_capacity
-        description: Seating capacity of the home arena.
-      - name: owner
-        description: Current team owner(s).
-        dimension:
-          type: categorical
-      - name: general_manager
-        description: Current general manager.
-        dimension:
-          type: categorical
-      - name: head_coach
-        description: Current head coach.
-        dimension:
-          type: categorical
-      - name: g_league_affiliate
-        description: NBA G League affiliate team.
-        dimension:
-          type: categorical
-      - name: total_games_played
-        description: All-time total games played by this franchise in the dataset.
-      - name: total_wins
-        description: All-time total wins by this franchise in the dataset.
-      - name: total_losses
-        description: All-time total losses by this franchise in the dataset.
-      - name: all_time_win_pct
-        description: All-time win percentage for this franchise in the dataset.
-
-  - name: dim_games
-    description: >
-      Game dimension table — one row per NBA game. Provides full game context
-      including date, season, matchup, TV network, attendance, and officials.
-      Join to fact tables on game_id.
-    semantic_model:
-      enabled: true
-      name: games
-    agg_time_dimension: game_date
-    columns:
-      - name: game_id
-        description: Primary key — unique identifier for each game.
-        entity:
-          type: primary
-          name: game
-        data_tests:
-          - unique
-          - not_null
-      - name: game_date
-        description: Date the game was played.
-        granularity: day
-        dimension:
-          type: time
-        data_tests:
-          - not_null
-      - name: game_year
-        description: Calendar year the game was played.
-      - name: game_month
-        description: Month number the game was played (1-12).
-      - name: game_day_of_week
-        description: Day of the week the game was played (0=Sunday in Snowflake).
-      - name: season_id
-        description: NBA season identifier.
-      - name: season
-        description: NBA season label (e.g., 2021-22).
-        dimension:
-          type: categorical
-      - name: season_type
-        description: Game type — Regular Season, Playoffs, Preseason, etc.
-        dimension:
-          type: categorical
-      - name: team_id_home
-        description: Foreign key to dim_teams for the home team.
-        entity:
-          type: foreign
-          name: team_home
-      - name: team_id_away
-        description: Foreign key to dim_teams for the away team.
-        entity:
-          type: foreign
-          name: team_away
-      - name: winning_team_id
-        description: Team ID of the game winner.
-        entity:
-          type: foreign
-          name: winning_team
-      - name: national_tv_network
-        description: National TV broadcaster (e.g., ESPN, TNT). Null for local-only games.
-        dimension:
-          type: categorical
-      - name: attendance
-        description: Number of fans in attendance.
-      - name: went_to_overtime
-        description: Boolean — true if the game went to overtime.
-        dimension:
-          type: categorical
-      - name: point_differential
-        description: Absolute final score difference between the two teams.
-      - name: officials_crew
-        description: Comma-separated list of referee names for the game.
-      - name: matchup
-        description: Home team matchup string.
-        dimension:
-          type: categorical
-    metrics:
-      - name: game_count
-        description: Count of NBA games on the schedule.
-        label: Game Count
-        type: simple
-        agg: count_distinct
+    entities:
+      - name: team_game
+        type: primary
+        expr: "cast(game_id as varchar) || '-' || cast(team_id as varchar)"
+      - name: game
+        type: foreign
         expr: game_id
-      - name: attended_game_count
-        description: Count of games with recorded attendance.
-        label: Attended Game Count
-        type: simple
-        agg: sum
-        expr: case when attendance is not null then 1 else 0 end
-      - name: overtime_game_count
-        description: Count of games that went to overtime.
-        label: Overtime Game Count
-        type: simple
-        agg: sum_boolean
-        expr: went_to_overtime
+      - name: team
+        type: foreign
+        expr: team_id
 
-  - name: fct_games
-    description: >
-      Core game fact table — one row per NBA game with full box score stats for
-      both teams, quarter-by-quarter scoring, advanced stats, and derived fields.
-      The primary fact table for any game-level analysis or aggregation.
-    semantic_model:
-      enabled: true
-      name: game_box_scores
-    agg_time_dimension: game_date
-    derived_semantics:
-      entities:
-        - name: game_box_score
-          expr: game_id
-          type: primary
-    columns:
-      - name: game_id
-        description: Primary key — unique identifier for each game.
-        entity:
-          type: foreign
-          name: game
-        data_tests:
-          - unique
-          - not_null
+    dimensions:
       - name: game_date
-        description: Date the game was played.
-        granularity: day
-        dimension:
-          type: time
-        data_tests:
-          - not_null
-      - name: team_id_home
-        description: Foreign key to dim_teams — home team.
-        entity:
-          type: foreign
-          name: team_home
-      - name: team_id_away
-        description: Foreign key to dim_teams — away team.
-        entity:
-          type: foreign
-          name: team_away
-      - name: pts_home
-        description: Final points scored by the home team.
-      - name: pts_away
-        description: Final points scored by the away team.
-      - name: winning_team_id
-        description: Team ID of the game winner.
-        entity:
-          type: foreign
-          name: winning_team
-      - name: point_differential
-        description: Absolute difference in final score.
-      - name: total_pts_scored
-        description: Combined points scored by both teams (pts_home + pts_away).
-      - name: went_to_overtime
-        description: Boolean — true if the game went to overtime.
-        dimension:
-          type: categorical
-      - name: lead_changes
-        description: Number of times the lead changed hands during the game.
-      - name: times_tied
-        description: Number of times the game was tied.
+        type: time
+        expr: game_date
+        type_params:
+          time_granularity: day
+
       - name: season
-        description: NBA season label.
-        dimension:
-          type: categorical
-      - name: season_type
-        description: Game type — Regular Season, Playoffs, Preseason, etc.
-        dimension:
-          type: categorical
-      - name: national_tv_network
-        description: National TV broadcaster.
-        dimension:
-          type: categorical
-      - name: attendance
-        description: Number of fans in attendance.
-    metrics:
-      - name: box_score_game_count
-        description: Count of completed NBA games in the box score fact table.
-        label: Box Score Game Count
-        type: simple
-        agg: count_distinct
-        expr: game_id
-      - name: total_points_scored
-        description: Total combined points scored across both teams.
-        label: Total Points Scored
-        type: simple
-        agg: sum
-        expr: total_pts_scored
-      - name: avg_total_points_scored
-        description: Average combined points scored per game.
-        label: Avg Total Points Scored
-        type: simple
-        agg: average
-        expr: total_pts_scored
-      - name: avg_attendance
-        description: Average attendance per game.
-        label: Avg Attendance
-        type: simple
-        agg: average
-        expr: attendance
-      - name: overtime_box_score_game_count
-        description: Count of box score games that went to overtime.
-        label: Overtime Box Score Game Count
-        type: simple
-        agg: sum_boolean
-        expr: went_to_overtime
-      - name: avg_point_differential
-        description: Average final score margin per game.
-        label: Avg Point Differential
-        type: simple
-        agg: average
-        expr: point_differential
-      - name: avg_lead_changes
-        description: Average number of lead changes per game.
-        label: Avg Lead Changes
-        type: simple
-        agg: average
-        expr: lead_changes
-      - name: avg_times_tied
-        description: Average number of ties per game.
-        label: Avg Times Tied
-        type: simple
-        agg: average
-        expr: times_tied
+        type: categorical
+        expr: cast(season as varchar)
+        description: "NBA season label (e.g. 2021, 2022)"
 
-  - name: fct_team_game_stats
-    description: >
-      Team-game fact table — one row per team per game. Unpivoted from the wide
-      home/away format, making it easy to query team performance across any date range
-      or opponent without complex case statements. The go-to table for team analysis.
-    semantic_model:
-      enabled: true
-      name: team_game_stats
-    agg_time_dimension: game_date
-    derived_semantics:
-      entities:
-        - name: team_game
-          expr: concat(team_id, '-', game_id)
-          type: primary
-    columns:
-      - name: game_id
-        description: Foreign key referencing the game.
-        entity:
-          type: foreign
-          name: game
-        data_tests:
-          - not_null
-      - name: team_id
-        description: Foreign key to dim_teams — the team this row represents.
-        entity:
-          type: foreign
-          name: team
-        data_tests:
-          - not_null
-      - name: game_date
-        description: Date the game was played.
-        granularity: day
-        dimension:
-          type: time
+      - name: season_type
+        type: categorical
+        description: "Regular Season, Playoffs, Preseason, etc."
+
       - name: home_away
-        description: Whether this team was the home or away team.
-        dimension:
-          type: categorical
-        data_tests:
-          - accepted_values:
-              arguments:
-                values: ['home', 'away']
-      - name: win_loss
-        description: Game result from this team's perspective — 'W' or 'L'.
-        dimension:
-          type: categorical
-        data_tests:
-          - accepted_values:
-              arguments:
-                values: ['W', 'L']
-      - name: is_win
-        description: Binary win indicator (1 = win, 0 = loss).
-      - name: pts
-        description: Points scored by this team.
-      - name: opponent_pts
-        description: Points scored by the opponent.
-      - name: point_differential
-        description: This team's pts minus opponent pts. Positive = win.
-      - name: fg_pct
-        description: Field goal percentage.
-      - name: fg3_pct
-        description: Three-point field goal percentage.
-      - name: ft_pct
-        description: Free throw percentage.
-      - name: season
-        description: NBA season label.
-        dimension:
-          type: categorical
-      - name: season_type
-        description: Game type — Regular Season, Playoffs, Preseason, etc.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Whether the team was home or away"
+
       - name: team_name
-        description: Team full name.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Full team name"
+
       - name: team_abbreviation
-        description: Team abbreviation.
-        dimension:
-          type: categorical
-      - name: opponent_team_id
-        description: Opponent team identifier.
-        entity:
-          type: foreign
-          name: opponent_team
+        type: categorical
+        description: "3-letter team abbreviation (e.g. LAL, GSW)"
+
       - name: opponent_team_name
-        description: Opponent team full name.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Opponent full team name"
+
       - name: opponent_team_abbreviation
-        description: Opponent team abbreviation.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Opponent 3-letter abbreviation"
+
       - name: national_tv_network
-        description: National TV broadcaster.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "National TV broadcaster (ESPN, TNT, ABC, etc.) — null for local games"
+
       - name: went_to_overtime
-        description: Boolean — true if the game went to overtime.
-        dimension:
-          type: categorical
-      - name: reb
-        description: Total rebounds.
-      - name: ast
-        description: Total assists.
-      - name: tov
-        description: Total turnovers.
-      - name: fg3m
-        description: Total made three-pointers.
-      - name: ftm
-        description: Total made free throws.
-    metrics:
-      - name: team_game_count
-        description: Count of team-game appearances.
-        label: Team Game Count
-        type: simple
-        agg: count
-        expr: 1
-      - name: team_wins
-        description: Count of team wins.
-        label: Team Wins
-        type: simple
+        type: categorical
+        expr: cast(went_to_overtime as varchar)
+        description: "Whether the game went to overtime (true/false)"
+
+      - name: win_loss
+        type: categorical
+        description: "Game result from this team's perspective — W or L"
+
+    measures:
+      - name: wins
+        description: "Total wins"
         agg: sum
         expr: is_win
-      - name: team_losses
-        description: Count of team losses.
-        label: Team Losses
-        type: simple
-        agg: sum
-        expr: case when is_win = 0 then 1 else 0 end
-      - name: home_team_game_count
-        description: Count of home team-games.
-        label: Home Team Game Count
-        type: simple
+        agg_time_dimension: game_date
+
+      - name: games_played
+        description: "Total games played"
         agg: count
-        expr: 1
-        filter: "{{ Dimension('team_game__home_away') }} = 'home'"
-      - name: away_team_game_count
-        description: Count of away team-games.
-        label: Away Team Game Count
-        type: simple
-        agg: count
-        expr: 1
-        filter: "{{ Dimension('team_game__home_away') }} = 'away'"
-      - name: home_team_wins
-        description: Count of home wins from the team's perspective.
-        label: Home Team Wins
-        type: simple
-        agg: sum
-        expr: is_win
-        filter: "{{ Dimension('team_game__home_away') }} = 'home'"
-      - name: away_team_wins
-        description: Count of away wins from the team's perspective.
-        label: Away Team Wins
-        type: simple
-        agg: sum
-        expr: is_win
-        filter: "{{ Dimension('team_game__home_away') }} = 'away'"
-      - name: team_points
-        description: Total points scored by teams.
-        label: Team Points
-        type: simple
+        expr: game_id
+        agg_time_dimension: game_date
+
+      - name: total_pts
+        description: "Total points scored"
         agg: sum
         expr: pts
-      - name: avg_team_points
-        description: Average points scored by a team per game.
-        label: Avg Team Points
-        type: simple
+        agg_time_dimension: game_date
+
+      - name: avg_pts
+        description: "Average points scored per game"
         agg: average
         expr: pts
-      - name: avg_opponent_points_allowed
-        description: Average points allowed per team-game.
-        label: Avg Opponent Points Allowed
-        type: simple
-        agg: average
-        expr: opponent_pts
-      - name: avg_point_margin
-        description: Average scoring margin per team-game.
-        label: Avg Point Margin
-        type: simple
-        agg: average
-        expr: point_differential
-      - name: team_rebounds
-        description: Total rebounds recorded by teams.
-        label: Team Rebounds
-        type: simple
+        agg_time_dimension: game_date
+
+      - name: total_fgm
+        description: "Total field goals made"
         agg: sum
-        expr: reb
-      - name: team_assists
-        description: Total assists recorded by teams.
-        label: Team Assists
-        type: simple
+        expr: fgm
+        agg_time_dimension: game_date
+
+      - name: total_fga
+        description: "Total field goals attempted"
         agg: sum
-        expr: ast
-      - name: team_turnovers
-        description: Total turnovers committed by teams.
-        label: Team Turnovers
-        type: simple
-        agg: sum
-        expr: tov
-      - name: team_three_pointers_made
-        description: Total three-pointers made by teams.
-        label: Team Three Pointers Made
-        type: simple
+        expr: fga
+        agg_time_dimension: game_date
+
+      - name: total_fg3m
+        description: "Total three-pointers made"
         agg: sum
         expr: fg3m
-      - name: team_free_throws_made
-        description: Total free throws made by teams.
-        label: Team Free Throws Made
-        type: simple
+        agg_time_dimension: game_date
+
+      - name: total_fg3a
+        description: "Total three-pointers attempted"
+        agg: sum
+        expr: fg3a
+        agg_time_dimension: game_date
+
+      - name: total_ftm
+        description: "Total free throws made"
         agg: sum
         expr: ftm
-      - name: overtime_team_game_count
-        description: Count of team-games that went to overtime.
-        label: Overtime Team Game Count
-        type: simple
-        agg: sum_boolean
-        expr: went_to_overtime
-      - name: nationally_televised_team_game_count
-        description: Count of team-games shown on a national TV network.
-        label: Nationally Televised Team Game Count
-        type: simple
-        agg: sum
-        expr: case when national_tv_network is not null then 1 else 0 end
+        agg_time_dimension: game_date
 
-  - name: fct_draft
+      - name: total_fta
+        description: "Total free throws attempted"
+        agg: sum
+        expr: fta
+        agg_time_dimension: game_date
+
+      - name: avg_fg_pct
+        description: "Average field goal percentage"
+        agg: average
+        expr: fg_pct
+        agg_time_dimension: game_date
+
+      - name: avg_ft_pct
+        description: "Average free throw percentage"
+        agg: average
+        expr: ft_pct
+        agg_time_dimension: game_date
+
+      - name: total_reb
+        description: "Total rebounds"
+        agg: sum
+        expr: reb
+        agg_time_dimension: game_date
+
+      - name: avg_reb
+        description: "Average rebounds per game"
+        agg: average
+        expr: reb
+        agg_time_dimension: game_date
+
+      - name: total_ast
+        description: "Total assists"
+        agg: sum
+        expr: ast
+        agg_time_dimension: game_date
+
+      - name: avg_ast
+        description: "Average assists per game"
+        agg: average
+        expr: ast
+        agg_time_dimension: game_date
+
+      - name: total_pf
+        description: "Total personal fouls committed"
+        agg: sum
+        expr: pf
+        agg_time_dimension: game_date
+
+      - name: total_plus_minus
+        description: "Total cumulative plus/minus"
+        agg: sum
+        expr: plus_minus
+        agg_time_dimension: game_date
+
+      - name: avg_plus_minus
+        description: "Average plus/minus per game"
+        agg: average
+        expr: plus_minus
+        agg_time_dimension: game_date
+
+      - name: total_attendance
+        description: "Total cumulative attendance across games"
+        agg: sum
+        expr: attendance
+        agg_time_dimension: game_date
+
+      - name: avg_attendance
+        description: "Average attendance per game"
+        agg: average
+        expr: attendance
+        agg_time_dimension: game_date
+
+      - name: total_point_differential
+        description: "Total cumulative point differential (positive = net winning margin)"
+        agg: sum
+        expr: point_differential
+        agg_time_dimension: game_date
+
+      - name: avg_point_differential
+        description: "Average point differential per game"
+        agg: average
+        expr: point_differential
+        agg_time_dimension: game_date
+
+
+  # ---------------------------------------------------------------------------
+  # fct_games
+  # Grain: one row per game
+  # ---------------------------------------------------------------------------
+  - name: games
     description: >
-      Draft fact table — one row per drafted NBA player. Combines draft pick details,
-      combine measurements, and current career outcomes. Ideal for scouting analysis
-      and demonstrating long-term draft value.
-    semantic_model:
-      enabled: true
-      name: draft_history
-    derived_semantics:
-      entities:
-        - name: draft_player
-          expr: player_id
-          type: primary
-    columns:
-      - name: player_id
-        description: Primary key — unique identifier for each drafted player.
-        entity:
-          type: foreign
-          name: player
-        data_tests:
-          - unique
-          - not_null
-      - name: player_name
-        description: Player's full name at time of draft.
-        dimension:
-          type: categorical
+      Game-level fact table. One row per NBA game. Used for game-count metrics,
+      attendance analysis, scoring pace, overtime rates, and game competitiveness
+      (lead changes, times tied, point differential).
+    model: ref('fct_games')
+
+    entities:
+      - name: game
+        type: primary
+        expr: game_id
+
+    dimensions:
+      - name: game_date
+        type: time
+        expr: game_date
+        type_params:
+          time_granularity: day
+
+      - name: season
+        type: categorical
+        expr: cast(season as varchar)
+        description: "NBA season label"
+
+      - name: season_type
+        type: categorical
+        description: "Regular Season, Playoffs, Preseason, etc."
+
+      - name: national_tv_network
+        type: categorical
+        description: "National TV broadcaster — null for local-only games"
+
+      - name: went_to_overtime
+        type: categorical
+        expr: cast(went_to_overtime as varchar)
+        description: "Whether the game went to overtime"
+
+      - name: team_name_home
+        type: categorical
+        description: "Home team full name"
+
+      - name: team_name_away
+        type: categorical
+        description: "Away team full name"
+
+      - name: winning_team_name
+        type: categorical
+        description: "Full name of the winning team"
+
+      - name: game_day_of_week
+        type: categorical
+        expr: cast(extract(dayofweek from game_date) as varchar)
+        description: "Day of the week the game was played (0=Sunday in Snowflake)"
+
+      - name: game_month
+        type: categorical
+        expr: cast(extract(month from game_date) as varchar)
+        description: "Month number the game was played (1-12)"
+
+    measures:
+      - name: total_games
+        description: "Total number of games"
+        agg: count_distinct
+        expr: game_id
+        agg_time_dimension: game_date
+
+      - name: game_attendance
+        description: "Total cumulative game attendance"
+        agg: sum
+        expr: attendance
+        agg_time_dimension: game_date
+
+      - name: avg_game_attendance
+        description: "Average attendance per game"
+        agg: average
+        expr: attendance
+        agg_time_dimension: game_date
+
+      - name: total_pts_scored
+        description: "Total combined points scored by both teams"
+        agg: sum
+        expr: total_pts_scored
+        agg_time_dimension: game_date
+
+      - name: avg_total_pts_scored
+        description: "Average combined points scored per game — pace indicator"
+        agg: average
+        expr: total_pts_scored
+        agg_time_dimension: game_date
+
+      - name: total_lead_changes
+        description: "Total lead changes across all games"
+        agg: sum
+        expr: lead_changes
+        agg_time_dimension: game_date
+
+      - name: avg_lead_changes
+        description: "Average lead changes per game"
+        agg: average
+        expr: lead_changes
+        agg_time_dimension: game_date
+
+      - name: total_times_tied
+        description: "Total times games were tied"
+        agg: sum
+        expr: times_tied
+        agg_time_dimension: game_date
+
+      - name: avg_times_tied
+        description: "Average times tied per game"
+        agg: average
+        expr: times_tied
+        agg_time_dimension: game_date
+
+      - name: overtime_games
+        description: "Number of games that went to overtime"
+        agg: sum
+        expr: "case when went_to_overtime then 1 else 0 end"
+        agg_time_dimension: game_date
+
+      - name: avg_game_point_differential
+        description: "Average absolute point differential per game (margin of victory)"
+        agg: average
+        expr: point_differential
+        agg_time_dimension: game_date
+
+      - name: home_wins
+        description: "Number of games won by the home team"
+        agg: sum
+        expr: "case when wl_home = 'W' then 1 else 0 end"
+        agg_time_dimension: game_date
+
+
+  # ---------------------------------------------------------------------------
+  # fct_draft
+  # Grain: one row per drafted player
+  # Uses a synthetic draft_date (June 1 of draft year) as the time dimension.
+  # ---------------------------------------------------------------------------
+  - name: draft
+    description: >
+      Draft fact table. One row per drafted NBA player. Used for draft analysis,
+      scouting benchmarks, combine measurement comparisons, and career outcome
+      analysis by pick position, team, school, or country.
+    model: ref('fct_draft')
+
+    entities:
+      - name: player
+        type: primary
+        expr: player_id
+
+    dimensions:
+      - name: draft_date
+        type: time
+        expr: "date_from_parts(draft_year, 6, 1)"
+        type_params:
+          time_granularity: year
+        description: "Synthetic date representing the draft (June 1 of draft year)"
+
       - name: draft_year
-        description: Year the player was drafted.
-        dimension:
-          type: categorical
-      - name: overall_pick
-        description: Overall pick number in the draft.
-        dimension:
-          type: categorical
-      - name: team_id
-        description: Foreign key to dim_teams — team that drafted the player.
-        entity:
-          type: foreign
-          name: team
-      - name: is_active
-        description: Whether the player is currently active in the NBA.
-        dimension:
-          type: categorical
-      - name: seasons_experience
-        description: Number of NBA seasons played (career longevity indicator).
-      - name: greatest_75_flag
-        description: Flag for NBA 75th Anniversary Team members — the ultimate career benchmark.
-        dimension:
-          type: categorical
+        type: categorical
+        expr: cast(draft_year as varchar)
+        description: "Year the player was drafted"
+
       - name: draft_round
-        description: Round in which the player was selected.
-        dimension:
-          type: categorical
-      - name: team_name
-        description: Drafting team name.
-        dimension:
-          type: categorical
-      - name: team_abbreviation
-        description: Drafting team abbreviation.
-        dimension:
-          type: categorical
+        type: categorical
+        expr: cast(draft_round as varchar)
+        description: "Round in which the player was selected (1 or 2)"
+
       - name: position
-        description: Player position.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Player position (Guard, Forward, Center)"
+
       - name: country
-        description: Player country.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Player country of origin"
+
       - name: college
-        description: Player college.
-        dimension:
-          type: categorical
-      - name: pre_draft_school
-        description: Pre-draft school or organization.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "College or university attended before the draft"
+
       - name: pre_draft_organization_type
-        description: Pre-draft organization type.
-        dimension:
-          type: categorical
+        type: categorical
+        description: "Type of pre-draft organization (College, International, High School, etc.)"
+
+      - name: team_name
+        type: categorical
+        description: "Team that drafted the player"
+
+      - name: is_active_flag
+        type: categorical
+        expr: cast(is_active as varchar)
+        description: "Whether the player is currently active (1=active, 0=retired)"
+
+    measures:
+      - name: players_drafted
+        description: "Total number of players drafted"
+        agg: count
+        expr: player_id
+        agg_time_dimension: draft_date
+
+      - name: active_players
+        description: "Number of drafted players currently active in the NBA"
+        agg: sum
+        expr: is_active
+        agg_time_dimension: draft_date
+
+      - name: avg_seasons_experience
+        description: "Average number of NBA seasons played"
+        agg: average
+        expr: seasons_experience
+        agg_time_dimension: draft_date
+
+      - name: avg_overall_pick
+        description: "Average overall draft pick number"
+        agg: average
+        expr: overall_pick
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_weight
+        description: "Average body weight at the NBA Draft Combine (lbs)"
+        agg: average
+        expr: combine_weight
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_max_vertical
+        description: "Average max vertical leap at the Draft Combine (inches)"
+        agg: average
+        expr: combine_max_vertical
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_standing_vertical
+        description: "Average standing vertical leap at the Draft Combine (inches)"
+        agg: average
+        expr: combine_standing_vertical
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_lane_agility
+        description: "Average lane agility time at the Draft Combine (seconds — lower is better)"
+        agg: average
+        expr: combine_lane_agility_time
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_sprint_time
+        description: "Average 3/4 court sprint time at the Draft Combine (seconds — lower is better)"
+        agg: average
+        expr: combine_sprint_time
+        agg_time_dimension: draft_date
+
+      - name: avg_combine_bench_press
+        description: "Average bench press reps at the Draft Combine"
+        agg: average
+        expr: combine_bench_press_reps
+        agg_time_dimension: draft_date
+
+
+  # ---------------------------------------------------------------------------
+  # dim_teams
+  # Grain: one row per NBA franchise
+  # Dimension-only model — no measures (no time dimension available).
+  # ---------------------------------------------------------------------------
+  - name: teams
+    description: >
+      Team dimension table. One row per NBA franchise. Provides team identity,
+      arena info, leadership, and conference/division for slicing fact metrics
+      by team attributes. Join to fact tables via the team entity.
+    model: ref('dim_teams')
+
+    entities:
+      - name: team
+        type: primary
+        expr: team_id
+
+    dimensions:
+      - name: team_name
+        type: categorical
+        description: "Full franchise name (e.g. Los Angeles Lakers)"
+
+      - name: team_abbreviation
+        type: categorical
+        description: "3-letter team abbreviation (e.g. LAL)"
+
+      - name: team_nickname
+        type: categorical
+        description: "Team nickname (e.g. Lakers)"
+
+      - name: team_city
+        type: categorical
+        description: "City the team represents"
+
+      - name: team_state
+        type: categorical
+        description: "State the team is based in"
+
+      - name: year_founded
+        type: categorical
+        expr: cast(year_founded as varchar)
+        description: "Year the franchise was founded"
+
+      - name: arena
+        type: categorical
+        description: "Name of the home arena"
+
+      - name: head_coach
+        type: categorical
+        description: "Current head coach"
+
+      - name: general_manager
+        type: categorical
+        description: "Current general manager"
+
+      - name: owner
+        type: categorical
+        description: "Current team owner(s)"
+
+      - name: g_league_affiliate
+        type: categorical
+        description: "NBA G League affiliate team"

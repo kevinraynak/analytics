@@ -1,44 +1,364 @@
-version: 2
-
 metrics:
-  - name: team_win_pct
-    description: Win percentage for team-game rows.
-    label: Team Win %
-    type: ratio
-    numerator: team_wins
-    denominator: team_game_count
 
-  - name: home_win_pct
-    description: Win percentage in home games.
-    label: Home Win %
-    type: ratio
-    numerator: home_team_wins
-    denominator: home_team_game_count
+  # ===========================================================================
+  # TEAM PERFORMANCE METRICS (from team_game_stats)
+  # ===========================================================================
 
-  - name: away_win_pct
-    description: Win percentage in away games.
-    label: Away Win %
+  - name: total_wins
+    label: "Total Wins"
+    description: "Total number of wins. Slice by team, season, season type, or home/away."
+    type: simple
+    type_params:
+      measure: wins
+
+  - name: total_games_played
+    label: "Total Games Played"
+    description: "Total number of team-game appearances."
+    type: simple
+    type_params:
+      measure: games_played
+
+  - name: win_percentage
+    label: "Win Percentage"
+    description: "Win percentage (wins / games played). Slice by team, season, or home/away."
     type: ratio
-    numerator: away_team_wins
-    denominator: away_team_game_count
+    type_params:
+      numerator: total_wins
+      denominator: total_games_played
+
+  - name: total_points_scored
+    label: "Total Points Scored"
+    description: "Total points scored. Useful for season-long or career scoring comparisons."
+    type: simple
+    type_params:
+      measure: total_pts
+
+  - name: avg_points_per_game
+    label: "Average Points Per Game"
+    description: "Average points scored per game. Core offensive output metric."
+    type: simple
+    type_params:
+      measure: avg_pts
+
+  - name: total_field_goals_made
+    label: "Total Field Goals Made"
+    description: "Total field goals made across all games."
+    type: simple
+    type_params:
+      measure: total_fgm
+
+  - name: total_field_goal_attempts
+    label: "Total Field Goal Attempts"
+    description: "Total field goals attempted across all games."
+    type: simple
+    type_params:
+      measure: total_fga
+
+  - name: total_three_pointers_made
+    label: "Total Three-Pointers Made"
+    description: "Total three-point field goals made."
+    type: simple
+    type_params:
+      measure: total_fg3m
+
+  - name: total_three_point_attempts
+    label: "Total Three-Point Attempts"
+    description: "Total three-point field goals attempted."
+    type: simple
+    type_params:
+      measure: total_fg3a
+
+  - name: three_point_attempt_rate
+    label: "Three-Point Attempt Rate"
+    description: >
+      Share of field goal attempts that are three-pointers (3PA / FGA).
+      Measures how perimeter-oriented a team's offense is.
+    type: ratio
+    type_params:
+      numerator: total_three_point_attempts
+      denominator: total_field_goal_attempts
+
+  - name: avg_field_goal_percentage
+    label: "Average Field Goal Percentage"
+    description: "Average field goal shooting percentage. Core shooting efficiency metric."
+    type: simple
+    type_params:
+      measure: avg_fg_pct
+
+  - name: avg_free_throw_percentage
+    label: "Average Free Throw Percentage"
+    description: "Average free throw shooting percentage."
+    type: simple
+    type_params:
+      measure: avg_ft_pct
+
+  - name: total_free_throw_attempts
+    label: "Total Free Throw Attempts"
+    description: "Total free throw attempts across all games."
+    type: simple
+    type_params:
+      measure: total_fta
+
+  - name: free_throw_rate
+    label: "Free Throw Rate"
+    description: >
+      Free throw attempts per field goal attempt (FTA / FGA).
+      Measures how aggressively a team attacks the basket and draws fouls.
+    type: ratio
+    type_params:
+      numerator: total_free_throw_attempts
+      denominator: total_field_goal_attempts
+
+  - name: total_rebounds
+    label: "Total Rebounds"
+    description: "Total rebounds across all games."
+    type: simple
+    type_params:
+      measure: total_reb
+
+  - name: avg_rebounds_per_game
+    label: "Average Rebounds Per Game"
+    description: "Average total rebounds per game."
+    type: simple
+    type_params:
+      measure: avg_reb
+
+  - name: total_assists
+    label: "Total Assists"
+    description: "Total assists across all games."
+    type: simple
+    type_params:
+      measure: total_ast
+
+  - name: avg_assists_per_game
+    label: "Average Assists Per Game"
+    description: "Average assists per game. Indicator of ball movement and team play."
+    type: simple
+    type_params:
+      measure: avg_ast
+
+  - name: avg_plus_minus_per_game
+    label: "Average Plus/Minus Per Game"
+    description: >
+      Average team plus/minus per game — net points scored vs. allowed per game.
+      Positive values indicate a dominant team; negative values suggest struggling.
+    type: simple
+    type_params:
+      measure: avg_plus_minus
+
+  - name: total_personal_fouls
+    label: "Total Personal Fouls"
+    description: "Total personal fouls committed. High values can indicate undisciplined or physical play."
+    type: simple
+    type_params:
+      measure: total_pf
+
+  - name: avg_team_attendance
+    label: "Average Home Game Attendance"
+    description: "Average attendance at games — useful for franchise popularity and revenue analysis."
+    type: simple
+    type_params:
+      measure: avg_attendance
+
+  - name: net_point_differential
+    label: "Net Point Differential"
+    description: >
+      Cumulative point differential — points scored minus points allowed over all games.
+      One of the best predictors of team quality beyond win-loss record.
+    type: simple
+    type_params:
+      measure: total_point_differential
+
+  - name: avg_margin_of_victory
+    label: "Average Margin of Victory/Defeat"
+    description: >
+      Average point differential per game (positive = winning margin, negative = losing margin).
+      Better indicator of team dominance than win percentage alone.
+    type: simple
+    type_params:
+      measure: avg_point_differential
+
+
+  # ===========================================================================
+  # GAME-LEVEL METRICS (from games)
+  # ===========================================================================
+
+  - name: total_games
+    label: "Total Games"
+    description: "Total number of NBA games played. Slice by season or season type."
+    type: simple
+    type_params:
+      measure: total_games
+
+  - name: avg_game_attendance
+    label: "Average Game Attendance"
+    description: "Average number of fans per game. Tracks league-wide or team-specific fan engagement."
+    type: simple
+    type_params:
+      measure: avg_game_attendance
+
+  - name: total_game_attendance
+    label: "Total Game Attendance"
+    description: "Total cumulative fan attendance. Useful for revenue and franchise-value analysis."
+    type: simple
+    type_params:
+      measure: game_attendance
+
+  - name: avg_combined_points_per_game
+    label: "Average Combined Points Per Game"
+    description: >
+      Average total points scored by both teams combined. Primary indicator of offensive pace
+      and scoring environment — tracks how the game has evolved over time.
+    type: simple
+    type_params:
+      measure: avg_total_pts_scored
+
+  - name: avg_lead_changes_per_game
+    label: "Average Lead Changes Per Game"
+    description: >
+      Average number of times the lead changed hands per game.
+      Higher values indicate more competitive, back-and-forth games.
+    type: simple
+    type_params:
+      measure: avg_lead_changes
+
+  - name: avg_times_tied_per_game
+    label: "Average Times Tied Per Game"
+    description: "Average number of times a game was tied. Another measure of game competitiveness."
+    type: simple
+    type_params:
+      measure: avg_times_tied
+
+  - name: overtime_game_count
+    label: "Overtime Game Count"
+    description: "Total number of games that went to overtime."
+    type: simple
+    type_params:
+      measure: overtime_games
 
   - name: overtime_game_rate
-    description: Share of games that went to overtime.
-    label: Overtime Game Rate
+    label: "Overtime Game Rate"
+    description: "Proportion of games that went to overtime. Tracks how often games are decided late."
     type: ratio
-    numerator: overtime_box_score_game_count
-    denominator: box_score_game_count
+    type_params:
+      numerator: overtime_game_count
+      denominator: total_games
 
-  - name: overtime_team_game_rate
-    description: Share of team-games that went to overtime.
-    label: Overtime Team Game Rate
-    type: ratio
-    numerator: overtime_team_game_count
-    denominator: team_game_count
+  - name: total_home_wins
+    label: "Total Home Wins"
+    description: "Total number of games won by the home team."
+    type: simple
+    type_params:
+      measure: home_wins
 
-  - name: nationally_televised_team_game_rate
-    description: Share of team-games played on national TV.
-    label: National TV Team Game Rate
+  - name: home_win_rate
+    label: "Home Win Rate"
+    description: "Proportion of games won by the home team — measures home court advantage league-wide."
     type: ratio
-    numerator: nationally_televised_team_game_count
-    denominator: team_game_count
+    type_params:
+      numerator: total_home_wins
+      denominator: total_games
+
+  - name: avg_game_margin
+    label: "Average Game Margin"
+    description: >
+      Average absolute point differential per game (margin of victory).
+      Lower values indicate closer, more competitive games league-wide.
+    type: simple
+    type_params:
+      measure: avg_game_point_differential
+
+
+  # ===========================================================================
+  # DRAFT METRICS (from draft)
+  # ===========================================================================
+
+  - name: total_players_drafted
+    label: "Total Players Drafted"
+    description: "Total number of players drafted. Slice by year, round, team, college, or country."
+    type: simple
+    type_params:
+      measure: players_drafted
+
+  - name: active_players_from_draft
+    label: "Active Players From Draft"
+    description: "Number of drafted players currently on an active NBA roster."
+    type: simple
+    type_params:
+      measure: active_players
+
+  - name: draft_to_active_rate
+    label: "Draft-to-Active Rate"
+    description: >
+      Proportion of drafted players still active in the NBA.
+      Useful for evaluating the quality of a draft class, team, or school's pipeline.
+    type: ratio
+    type_params:
+      numerator: active_players_from_draft
+      denominator: total_players_drafted
+
+  - name: avg_career_seasons
+    label: "Average Career Seasons"
+    description: >
+      Average number of NBA seasons played by drafted players.
+      Slice by pick range, college, country, or draft year to evaluate career longevity.
+    type: simple
+    type_params:
+      measure: avg_seasons_experience
+
+  - name: avg_draft_pick_number
+    label: "Average Draft Pick Number"
+    description: >
+      Average overall draft pick number. Most useful when filtered by team, college, or country
+      to understand how early those players tend to be selected.
+    type: simple
+    type_params:
+      measure: avg_overall_pick
+
+  - name: avg_combine_vertical_leap
+    label: "Average Combine Vertical Leap"
+    description: >
+      Average max vertical leap at the NBA Draft Combine (inches).
+      Slice by position or draft year to benchmark athleticism.
+    type: simple
+    type_params:
+      measure: avg_combine_max_vertical
+
+  - name: avg_combine_standing_vertical
+    label: "Average Combine Standing Vertical"
+    description: "Average standing vertical leap at the NBA Draft Combine (inches)."
+    type: simple
+    type_params:
+      measure: avg_combine_standing_vertical
+
+  - name: avg_combine_sprint_time
+    label: "Average Combine Sprint Time"
+    description: >
+      Average 3/4 court sprint time at the Draft Combine (seconds — lower is faster).
+      Slice by position or pick range to compare athleticism profiles.
+    type: simple
+    type_params:
+      measure: avg_combine_sprint_time
+
+  - name: avg_combine_lane_agility
+    label: "Average Combine Lane Agility Time"
+    description: >
+      Average lane agility drill time at the Draft Combine (seconds — lower is better).
+      Measures lateral quickness and defensive footwork potential.
+    type: simple
+    type_params:
+      measure: avg_combine_lane_agility
+
+  - name: avg_combine_bench_press
+    label: "Average Combine Bench Press Reps"
+    description: "Average bench press reps at the Draft Combine. Measures upper body strength."
+    type: simple
+    type_params:
+      measure: avg_combine_bench_press
+
+  - name: avg_combine_weight
+    label: "Average Combine Weight"
+    description: "Average player weight at the NBA Draft Combine (lbs). Slice by position or draft year."
+    type: simple
+    type_params:
+      measure: avg_combine_weight
