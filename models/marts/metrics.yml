@@ -1,0 +1,44 @@
+version: 2
+
+metrics:
+  - name: team_win_pct
+    description: Win percentage for team-game rows.
+    label: Team Win %
+    type: ratio
+    numerator: team_wins
+    denominator: team_game_count
+
+  - name: home_win_pct
+    description: Win percentage in home games.
+    label: Home Win %
+    type: ratio
+    numerator: home_team_wins
+    denominator: home_team_game_count
+
+  - name: away_win_pct
+    description: Win percentage in away games.
+    label: Away Win %
+    type: ratio
+    numerator: away_team_wins
+    denominator: away_team_game_count
+
+  - name: overtime_game_rate
+    description: Share of games that went to overtime.
+    label: Overtime Game Rate
+    type: ratio
+    numerator: overtime_box_score_game_count
+    denominator: box_score_game_count
+
+  - name: overtime_team_game_rate
+    description: Share of team-games that went to overtime.
+    label: Overtime Team Game Rate
+    type: ratio
+    numerator: overtime_team_game_count
+    denominator: team_game_count
+
+  - name: nationally_televised_team_game_rate
+    description: Share of team-games played on national TV.
+    label: National TV Team Game Rate
+    type: ratio
+    numerator: nationally_televised_team_game_count
+    denominator: team_game_count
