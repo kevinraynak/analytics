@@ -701,3 +701,53 @@ models:
         description: Pre-draft organization type.
         dimension:
           type: categorical
+
+
+
+  - name: fct_player_25_5_5_seasons
+    description: >
+      One row per player per regular season where the player averaged at least
+      25 points, 5 assists, and 5 rebounds per game based on play-by-play-derived
+      box score events. Includes season totals, per-game averages, and the total
+      number of qualifying 25/5/5 seasons for each player across the dataset.
+    data_tests:
+      - unique:
+          column_name: "concat(player_id, '-', season)"
+    columns:
+      - name: player_id
+        description: Identifier for the player.
+        data_tests:
+          - not_null
+      - name: player_name
+        description: Player's full name.
+      - name: season
+        description: NBA season label for the qualifying regular season.
+        data_tests:
+          - not_null
+      - name: games_played
+        description: Number of distinct regular season games included for the player-season.
+        data_tests:
+          - not_null
+      - name: total_points
+        description: Total points scored by the player across the regular season.
+      - name: total_assists
+        description: Total assists credited to the player across the regular season.
+      - name: total_rebounds
+        description: Total rebounds recorded by the player across the regular season.
+      - name: points_per_game
+        description: Average points scored per game for the player-season.
+        data_tests:
+          - not_null
+      - name: assists_per_game
+        description: Average assists per game for the player-season.
+        data_tests:
+          - not_null
+      - name: rebounds_per_game
+        description: Average rebounds per game for the player-season.
+        data_tests:
+          - not_null
+      - name: times_25_5_5_seasons
+        description: Number of seasons in the dataset where this player met the 25/5/5 threshold.
+        data_tests:
+          - not_null
+
