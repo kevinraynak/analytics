@@ -345,6 +345,155 @@ models:
           type: categorical
       - name: attendance
         description: Number of fans in attendance.
+      - name: season_id
+        description: Source season identifier associated with the game.
+      - name: team_name_home
+        description: Full name of the home team at the time of the game.
+      - name: team_abbreviation_home
+        description: Home team's three-letter abbreviation at the time of the game.
+      - name: wl_home
+        description: Game result for the home team, where `W` is a win and `L` is a loss.
+      - name: plus_minus_home
+        description: Home team's final scoring margin; positive values indicate a home win.
+      - name: fgm_home
+        description: Field goals made by the home team.
+      - name: fga_home
+        description: Field goals attempted by the home team.
+      - name: fg_pct_home
+        description: Home team field-goal percentage.
+      - name: fg3m_home
+        description: Three-point field goals made by the home team.
+      - name: fg3a_home
+        description: Three-point field goals attempted by the home team.
+      - name: fg3_pct_home
+        description: Home team three-point field-goal percentage.
+      - name: ftm_home
+        description: Free throws made by the home team.
+      - name: fta_home
+        description: Free throws attempted by the home team.
+      - name: ft_pct_home
+        description: Home team free-throw percentage.
+      - name: oreb_home
+        description: Offensive rebounds recorded by the home team.
+      - name: dreb_home
+        description: Defensive rebounds recorded by the home team.
+      - name: reb_home
+        description: Total rebounds recorded by the home team.
+      - name: ast_home
+        description: Assists recorded by the home team.
+      - name: stl_home
+        description: Steals recorded by the home team.
+      - name: blk_home
+        description: Blocks recorded by the home team.
+      - name: tov_home
+        description: Turnovers committed by the home team.
+      - name: pf_home
+        description: Personal fouls committed by the home team.
+      - name: pts_paint_home
+        description: Home-team points scored in the paint; unavailable for some historical games.
+      - name: pts_2nd_chance_home
+        description: Home-team points scored on second-chance possessions; unavailable for some historical games.
+      - name: pts_fast_break_home
+        description: Home-team fast-break points; unavailable for some historical games.
+      - name: pts_off_turnovers_home
+        description: Home-team points scored off opponent turnovers; unavailable for some historical games.
+      - name: largest_lead_home
+        description: Largest in-game lead held by the home team; unavailable for some historical games.
+      - name: team_turnovers_home
+        description: Team turnovers charged to the home team that are not attributed to an individual player.
+      - name: total_turnovers_home
+        description: Total home-team turnovers, including player and team turnovers.
+      - name: team_name_away
+        description: Full name of the away team at the time of the game.
+      - name: team_abbreviation_away
+        description: Away team's three-letter abbreviation at the time of the game.
+      - name: wl_away
+        description: Game result for the away team, where `W` is a win and `L` is a loss.
+      - name: plus_minus_away
+        description: Away team's final scoring margin; positive values indicate an away win.
+      - name: fgm_away
+        description: Field goals made by the away team.
+      - name: fga_away
+        description: Field goals attempted by the away team.
+      - name: fg_pct_away
+        description: Away team field-goal percentage.
+      - name: fg3m_away
+        description: Three-point field goals made by the away team.
+      - name: fg3a_away
+        description: Three-point field goals attempted by the away team.
+      - name: fg3_pct_away
+        description: Away team three-point field-goal percentage.
+      - name: ftm_away
+        description: Free throws made by the away team.
+      - name: fta_away
+        description: Free throws attempted by the away team.
+      - name: ft_pct_away
+        description: Away team free-throw percentage.
+      - name: oreb_away
+        description: Offensive rebounds recorded by the away team.
+      - name: dreb_away
+        description: Defensive rebounds recorded by the away team.
+      - name: reb_away
+        description: Total rebounds recorded by the away team.
+      - name: ast_away
+        description: Assists recorded by the away team.
+      - name: stl_away
+        description: Steals recorded by the away team.
+      - name: blk_away
+        description: Blocks recorded by the away team.
+      - name: tov_away
+        description: Turnovers committed by the away team.
+      - name: pf_away
+        description: Personal fouls committed by the away team.
+      - name: pts_paint_away
+        description: Away-team points scored in the paint; unavailable for some historical games.
+      - name: pts_2nd_chance_away
+        description: Away-team points scored on second-chance possessions; unavailable for some historical games.
+      - name: pts_fast_break_away
+        description: Away-team fast-break points; unavailable for some historical games.
+      - name: pts_off_turnovers_away
+        description: Away-team points scored off opponent turnovers; unavailable for some historical games.
+      - name: largest_lead_away
+        description: Largest in-game lead held by the away team; unavailable for some historical games.
+      - name: team_turnovers_away
+        description: Team turnovers charged to the away team that are not attributed to an individual player.
+      - name: total_turnovers_away
+        description: Total away-team turnovers, including player and team turnovers.
+      - name: pts_qtr1_home
+        description: Home-team points scored in the first quarter.
+      - name: pts_qtr2_home
+        description: Home-team points scored in the second quarter.
+      - name: pts_qtr3_home
+        description: Home-team points scored in the third quarter.
+      - name: pts_qtr4_home
+        description: Home-team points scored in the fourth quarter.
+      - name: pts_ot1_home
+        description: Home-team points scored in the first overtime period; null when the period was not played.
+      - name: pts_ot2_home
+        description: Home-team points scored in the second overtime period; null when the period was not played.
+      - name: pts_ot3_home
+        description: Home-team points scored in the third overtime period; null when the period was not played.
+      - name: pts_ot4_home
+        description: Home-team points scored in the fourth overtime period; null when the period was not played.
+      - name: pts_qtr1_away
+        description: Away-team points scored in the first quarter.
+      - name: pts_qtr2_away
+        description: Away-team points scored in the second quarter.
+      - name: pts_qtr3_away
+        description: Away-team points scored in the third quarter.
+      - name: pts_qtr4_away
+        description: Away-team points scored in the fourth quarter.
+      - name: pts_ot1_away
+        description: Away-team points scored in the first overtime period; null when the period was not played.
+      - name: pts_ot2_away
+        description: Away-team points scored in the second overtime period; null when the period was not played.
+      - name: pts_ot3_away
+        description: Away-team points scored in the third overtime period; null when the period was not played.
+      - name: pts_ot4_away
+        description: Away-team points scored in the fourth overtime period; null when the period was not played.
+      - name: winning_team_name
+        description: Full name of the team that won the game.
+
     metrics:
       - name: box_score_game_count
         description: Count of completed NBA games in the box score fact table.
@@ -701,7 +850,32 @@ models:
         description: Pre-draft organization type.
         dimension:
           type: categorical
-
+      - name: pick_in_round
+        description: Selection number within the draft round.
+      - name: draft_type
+        description: NBA draft classification recorded for the selection.
+      - name: team_city
+        description: City of the team that drafted the player.
+      - name: combine_height
+        description: Height measured with shoes at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_weight
+        description: Weight measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_wingspan
+        description: Wingspan measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_standing_reach
+        description: Standing reach measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_body_fat_pct
+        description: Body-fat percentage measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_max_vertical
+        description: Maximum vertical leap measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_standing_vertical
+        description: Standing vertical leap measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_lane_agility_time
+        description: Lane-agility drill time measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_sprint_time
+        description: Three-quarter-court sprint time measured at the NBA Draft Combine; null when no measurement is available.
+      - name: combine_bench_press_reps
+        description: Bench-press repetitions recorded at the NBA Draft Combine; null when no measurement is available.
 
 
   - name: fct_player_25_5_5_seasons
