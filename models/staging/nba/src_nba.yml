@@ -131,3 +131,8 @@ sources:
             description: Foreign key referencing the team.
             data_tests:
               - not_null
+
+
+models:
+  - name: stg_nba__player
+    description: Staging model with one row per NBA player. This is a test. Renames the raw player identifier to player_id and retains player name components and active status for downstream joins.
